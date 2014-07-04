@@ -1,0 +1,33 @@
+/*style*/
+body {
+	background: #aaa;
+}
+#wrapper {
+	background: #fff;
+	border: 1px solid #999;
+	box-shadow: 3px 3px 3px #888;
+}
+
+/*layout*/
+#wrapper {
+	position: relative;
+	
+	width: 300px;
+	left: 50%;
+	margin-left: -150px;
+	
+	height: 200px;
+	margin-top: 30vh;
+	
+	padding: 10px;
+}
+
+.top {
+	position: relative;
+	height: 60%;
+}
+
+.bottom {
+	position: relative;
+	height: 20%;
+}

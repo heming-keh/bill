@@ -1,0 +1,44 @@
+@(form: Form[(String, String)])(implicit flash: Flash)
+
+<html>
+<head>
+<title>登录</title>
+<link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/main.css")" />
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/login.css")" />
+</head>
+
+<body>
+<div id="wrapper">
+@helper.form(routes.Application.authenticate) {
+
+	<div class="top">
+	<ul>
+	<li></li>
+	<li><input type="text" name="username" placeholder="用户" id="username" value="@form("username").value"/></li>
+	</ul>
+	
+	<ul>
+	<li></li>
+	<li><input type="password" name="password" placeholder="密码" id="password" value="@form("password").value" /></li>
+	</ul>
+	
+	<ul>
+	<li></li>
+	<li><input type="submit" id="login" value="登录" /></li>
+	</ul>
+	</div>
+	
+	<div class="bottom">
+	@form.globalError.map { error =>
+		<p class="error">@error.message</p>
+	}
+	@flash.get("success").map { message =>
+		<p class="success">@message</p>
+	}
+	</div>
+	
+}
+</div>
+</body>
+</html>

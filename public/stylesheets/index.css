@@ -1,0 +1,66 @@
+/*style*/
+body {
+	background: #eee;
+}
+
+
+/*layout*/
+#wrapper {
+	position: relative;	
+	width: 900px;
+	left: 50%;
+	margin-left: -450px;	
+	margin-top: 50px;	
+	padding: 10px;
+}
+
+.top {
+	position: relative;
+}
+
+.middle {
+	position: relative;
+}
+
+.bottom {
+	position: relative;
+}
+
+#user_box, #settlement_box, #add_bill_box, #search_box, #search_result {
+	background: #fff;
+	border: 1px solid #fff;
+	box-shadow: 3px 3px 3px #ccc;
+	margin-top: 10px;
+}
+
+#user_box {
+	height: 35px;
+}
+
+#settlement_box {
+	height: 45px;
+}
+#settlement_box #settlement_btn {
+	float: right;
+	margin-right: 50px;
+}
+
+#bill_box {
+	height: 150px;
+}
+
+#search_box {
+	height: 40px;
+}
+
+#name {
+	width: 880px;
+}
+#pay_text {
+	width: 880px;
+}
+#balance_table {
+	text-align: left;
+	width: 880px;
+}
+

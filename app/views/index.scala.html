@@ -1,0 +1,232 @@
+@(payers: Seq[String], settlements: Seq[Int])(implicit session: play.api.mvc.Session) 
+
+<html>
+<head>
+<title>账单</title>
+<link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")" />
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/main.css")" />
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/index.css")" />
+
+<script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")"></script>
+
+<script type="text/javascript">
+	$(function() { // on document load
+		$('#settlement_box').hide();
+		$('#goto_settlement_btn').click(function() {
+			$('#settlement_box').toggle('normal');
+		});
+		$('#settlement_btn').click(function() {
+			$('#settlement_form').submit();
+		});
+		
+		// 默认隐藏添加账单的表单
+		$('#add_bill_box').hide();
+		
+		// 点击左上角的图标，弹出添加账单的表单
+		$('#new_bill_btn').click(function() {
+			$('#add_bill_box').toggle("normal");
+			$('#name').focus();
+		});
+
+		// 点击"添加"按钮时，添加账单
+		$('#add_bill_btn').click(
+				function(event) {
+					var data = $('#add_bill_form').serialize();
+					console.info(data);
+					// ajax请求
+					var request = $.ajax({
+						type : 'POST',
+						url : 'addbill',
+						data : data,
+					});
+					request.done(function(msg) {
+						console.log(msg);
+						LoadBills();
+						// 清空表单
+						$(':input', "#add_bill_form").not(
+								':button, :submit, :reset, :hidden').val('');
+						$('#add_bill_box').toggle("normal");
+					});
+					request.fail(function(msg) {
+						console.log(msg);
+						$('#err_msg').html(msg['responseText']);
+					});
+				});
+
+		var LoadBills = function() {
+			// 搜索表单转换成json
+			var dataJson = new Object();
+			dataJson.show_deleted = $("#show_deleted_cb").is(':checked');
+
+			dataJson.payers = [];
+			$('#search_form').find("[name=payers]").each(function() {
+				if ($(this).is(":checked")) {
+					dataJson.payers.push($(this).attr("value"));
+				}
+			});
+
+			dataJson.settlement = $("#settlement_select").val();
+			console.log(dataJson);
+
+			// ajax请求
+			var request = $.ajax({
+				type : 'POST',
+				url : 'search',
+				data : dataJson
+			});
+			request
+					.done(function(data) {
+						var bills = data['bills'];
+						var balance = data['balance'];
+						$('#bills_table')
+								.html(
+										'<tr><td class="cs">编号</td><td class="cw">名称</td><td class="cs">价格</td><td class="cm">日期</td><td class="cs"></td><td class="cs"></td></tr>');
+						$
+								.each(
+										bills,
+										function(i, item) {
+											var delete_link = item['deleteable'] == 'true' ? '<button class="delete_link" type="button" href="delete/' + item['id'] + '">删除</button>'
+													: '';
+											if (item['deleted'] == 'true') {
+												$('#bills_table')
+														.append(
+																'<tr class="deleted"><td class="cs">'
+																		+ item['id']
+																		+ '</td><td class="cw">'
+																		+ item['name']
+																		+ '</td><td class="cs">'
+																		+ item['price']
+																		+ '</td><td class="cm">'
+																		+ item['date']
+																		+ '</td><td class="cs">'
+																		+ item['user']
+																		+ '</td><td class="cs"></td></tr>');
+											} else {
+												$('#bills_table')
+														.append(
+																'<tr><td class="cs">'
+																		+ item['id']
+																		+ '</td><td class="cw">'
+																		+ item['name']
+																		+ '</td><td class="cs">'
+																		+ item['price']
+																		+ '</td><td class="cm">'
+																		+ item['date']
+																		+ '</td><td class="cs">'
+																		+ item['user']
+																		+ '</td><td class="cs">'
+																		+ (delete_link)
+																		+ '</td></tr>');
+											}
+										});
+
+						$('#balance_table').html('');
+						$.each(balance, function(i, item) {
+							$('#balance_table')
+									.append(
+											'<tr><td class="cs">' + item
+													+ '</td></tr>');
+						});
+
+						// 点击删除按钮时的动作
+						$('.delete_link').click(function(event) {
+							var url = $(this).attr('href');
+							console.log(url);
+							$.ajax({
+								type : 'GET',
+								url : url
+							}).done(function(msg) {
+								LoadBills();
+							}).fail(function(msg) {
+							});
+							event.preventDefault();
+						});
+					});
+			request.fail(function(msg) {
+				console.log(msg);
+			});
+		}
+
+		// 相关的按钮事情触发更新账单
+		$("input[name=payers]").click(LoadBills);
+		$('#show_deleted_cb').bind('change', LoadBills);
+		$('#settlement_select').bind('change', LoadBills);
+
+		LoadBills();
+	});
+</script>
+</head>
+
+<body>
+<div id="wrapper">
+
+<div id="user_box" class="top">
+<ul><li class="l"><a href="logout">@session.get("username")</a></li><li class="l"><a href="password">修改密码</a></li><li class="l"><a id="goto_settlement_btn" href="#">去结算</a></li><li class="r"><a id="new_bill_btn" href="#"><img src="@routes.Assets.at("images/add.png")" alt="添加" /></a></li></ul>
+</div>
+
+<div id="settlement_box">
+<form id="settlement_form" action="settlement" method="POST">
+<ul><li><a id="settlement_btn" href="#"><img src="@routes.Assets.at("images/settlement.png")" alt="添加" /></a></li></ul>
+</form>
+</div>
+
+<!-- 添加账单 -->
+<div id="add_bill_box" class="middle1">
+<form id="add_bill_form">
+	<ul>
+	<li></li>
+	<li><input type="text" name="name" class="winput" placeholder="名称" id="name" value=""/></li>
+	</ul>
+	
+	<ul>
+	<li></li>
+	<li><input type="text" name="pay" placeholder="价格" id="pay_text" value="" /></li>
+	</ul>
+	
+	<ul>
+	<li></li>
+	<li><button id="add_bill_btn" type="button">添加</button></li>
+	</ul>
+	
+	<p id="err_msg" class="error"></p>
+</form>
+</div>
+
+<!-- 搜索 -->
+<div id="search_box" class="bottom">
+<!-- 搜索表单 -->
+<form id="search_form">
+<ul>
+<li>
+<select id="settlement_select" name="settlement">
+@for(settlement <- settlements) {
+	@if(settlement < 0) {
+	<option value="@settlement">待结账单</option>
+	} else {	
+	<option value="@settlement">已结账单 @settlement</option>
+	}
+}
+</select>
+
+@for((payer, i) <- payers.zipWithIndex) { 
+	<input type="checkbox" id="payer@i" class="payer" name="payers" value="@payer" checked/><label>@payer</label>
+}
+<input id="show_deleted_cb" type="checkbox" name="show_deleted" value="true" /><label for="show_deleted_cb">已删</label>
+</li>
+
+</ul>
+</form>
+</div>
+<div id="search_result">
+<!-- 账单 -->
+<table id="bills_table">
+</table>
+<!-- 结算 -->
+<table id="balance_table">
+</table>
+
+</div>
+
+</div>
+</body>
+</html>

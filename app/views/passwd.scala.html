@@ -1,0 +1,50 @@
+@* passwd Template File *@
+@(form: Form[(String, String, String, String)])
+
+<html>
+<head>
+<title>密码</title>
+<link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/main.css")" />
+<link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/passwd.css")" />
+</head>
+
+<body>
+<div id="wrapper">
+@helper.form(routes.Application.changepasswd) {
+
+	<div class="top">
+	
+	<input type="hidden" name="username" id="username" value="@form("username").value" />
+	
+	<ul>
+	<li></li>
+	<li><input type="password" name="password" placeholder="旧密码" id="password" value="@form("password").value" /></li>
+	</ul>
+
+	<ul>
+	<li></li>
+	<li><input type="password" name="newpasswd" placeholder="新密码" id="newpasswd" value="@form("newpasswd").value" /></li>
+	</ul>
+	
+	<ul>
+	<li></li>
+	<li><input type="password" name="newpasswdr" placeholder="新确认" id="newpasswdr" value="@form("newpasswdr").value" /></li>
+	</ul>
+		
+	<ul>
+	<li></li>
+	<li><input type="submit" id="changepasswd" value="修改" /></li>
+	</ul>
+	</div>
+	
+	<div class="bottom">
+	@form.globalError.map { error =>
+		<p class="error">@error.message</p>
+	}
+	</div>
+	
+}
+</div>
+</body>
+</html>
