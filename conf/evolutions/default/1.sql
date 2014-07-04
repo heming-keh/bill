@@ -5,7 +5,7 @@ CREATE TABLE user (
     password VARCHAR(32) NOT NULL
 );
 
-INSERT INTO user VALUES ('葛海明', '123456'), ('刘吉龙', '123456'), ('卫国瑞', '123456'), ('葛晓俊', '123456');
+INSERT INTO user VALUES ('张三', '123456'), ('李四', '123456'), ('王五', '123456'), ('赵六', '123456');
 
 CREATE SEQUENCE bill_id_seq START WITH 10000;
 CREATE TABLE bill (
